@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import './App.css'
 import DiceButton from './components/DiceButton';
 import Results from './components/Results';
 
 function App() {
   const [results, setResults] = useState<number[]>([]);
+  const [rolling, setRolling] = useState<boolean>(false);
   const diceTypes = [4,6,8,10,12,20,100]
 
   const rollDice = (sides: number, times: number = 1): number[] => {
@@ -16,8 +17,12 @@ function App() {
   }
 
   const handleRoll = (sides: number, times: number = 1) => {
-    const rolls = rollDice(sides, times);
-    setResults(rolls);
+    setRolling(true);
+    setTimeout(() => {
+      const rolls = rollDice(sides, times);
+      setResults(rolls);
+      setRolling(false);
+    }, 1000);
   };
 
   const handleAdvantage = () => {
@@ -30,7 +35,7 @@ function App() {
     setResults([Math.min(...rolls)]);
   };
 
-  const handleSuccess = (times: number) => {
+  const handleSuccesses = (times: number) => {
     const rolls = rollDice(10, times);
     let successes = rolls.filter(roll => roll > 6).length;
     const criticalFailures = rolls.filter(roll => roll === 1).length;
@@ -51,9 +56,8 @@ function App() {
           <button className="mr-2 mb-2 px-3 py-2 bg-green-500 text-white rounded" onClick={handleAdvantage}>Vantagem</button>
           <button className="mr-2 mb-2 px-3 py-2 bg-red-500 text-white rounded" onClick={handleDisadvantage}>Desvantagem</button>
           <button className="mr-2 mb-2 px-3 py-2 bg-yellow-500 text-white rounded" onClick={() => handleSuccesses(10)}>10 Sucessos</button>
-          {/* Você pode adicionar mais botões para diferentes números de sucessos aqui */}
         </div>
-        <Results results={results} />
+        <Results results={results} rolling={rolling} />
       </div>
     </div>
   );
